@@ -5,10 +5,6 @@ set -ouex pipefail
 # Copy the contents of system_files/ of the git repo to /
 cp -avf "/ctx/system_files"/. /
 
-### Remove unwanted packages
-
-dnf5 -y remove foot
-
 ### Install packages
 
 # Packages can be installed from any enabled yum repo on the image.
@@ -16,8 +12,8 @@ dnf5 -y remove foot
 # List of rpmfusion packages can be found here:
 # https://mirrors.rpmfusion.org/mirrorlist?path=free/fedora/updates/43/x86_64/repoview/index.html&protocol=https&redirect=1
 
-# this installs a package from fedora repos
-dnf5 -y install tmux neovim ripgrep fd zsh just
+# Install packages from fedora repo
+dnf5 -y install distrobox
 
 # Use a COPR Example:
 #
@@ -27,17 +23,19 @@ dnf5 -y install tmux neovim ripgrep fd zsh just
 # dnf5 -y copr disable ublue-os/staging
 
 dnf5 -y copr enable scottames/ghostty
-dnf5 -y copr enable atim/starship
+dnf5 -y copr enable errornointernet/walker
 
-dnf -y install ghostty starship
+dnf5 -y install ghostty walker elephant
 
 dnf5 -y copr disable scottames/ghostty
-dnf5 -y copr disable atim/starship
+dnf5 -y copr disable errornointernet/walker
 
 ### Patch files
 
-sed -i 's/foot/ghostty/g' /etc/sway/config
+sed -i 's/^set \$term .*/set $term ghostty/' /etc/sway/config
+# fail the build if the patch missed
+grep -q '^set \$term ghostty' /etc/sway/config
 
-#### Example for enabling a System Unit File
+### Enable systemd units
 
-systemctl enable podman.socket
+elephant service enable
