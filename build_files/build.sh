@@ -38,4 +38,4 @@ grep -q '^set \$term ghostty' /etc/sway/config
 
 ### Enable systemd units
 
-elephant service enable
+systemctl --global enable elephant.service
